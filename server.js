@@ -470,7 +470,7 @@ app.get('/api/*', (req, res) => {
 });
 
 // Start listening
-const HOST = process.env.NODE_ENV === 'production' ? '0.0.0.0' : '127.0.0.1';
+const HOST = '0.0.0.0';
 app.listen(PORT, HOST, () => {
   console.log(`Server listening on http://${HOST}:${PORT}`);
   if (isMockDb) {
