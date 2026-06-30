@@ -321,6 +321,57 @@ app.post('/api/admin/teams', requireAuth, requireAdmin, async (req, res) => {
   }
 });
 
+app.post('/api/admin/teams/add', requireAuth, requireAdmin, async (req, res) => {
+  const { name } = req.body;
+  if (!name || typeof name !== 'string' || !name.trim()) {
+    return res.status(400).json({ error: 'Team name is required.' });
+  }
+
+  try {
+    const teamsSnapshot = await db.collection('teams').get();
+    let maxIndex = -1;
+    let maxIdNum = 0;
+
+    teamsSnapshot.forEach(doc => {
+      const data = doc.data();
+      if (typeof data.index === 'number' && data.index > maxIndex) {
+        maxIndex = data.index;
+      }
+      const match = doc.id.match(/^team_(\d+)$/);
+      if (match) {
+        const num = parseInt(match[1], 10);
+        if (num > maxIdNum) {
+          maxIdNum = num;
+        }
+      }
+    });
+
+    const nextIndex = maxIndex + 1;
+    const nextIdNum = maxIdNum + 1;
+    const newId = `team_${nextIdNum}`;
+    const trimmedName = name.trim();
+
+    await db.collection('teams').doc(newId).set({
+      id: newId,
+      name: trimmedName,
+      index: nextIndex
+    });
+
+    res.json({
+      success: true,
+      message: 'New team added successfully.',
+      team: {
+        id: newId,
+        name: trimmedName,
+        index: nextIndex
+      }
+    });
+  } catch (err) {
+    console.error('Error adding new team:', err);
+    res.status(500).json({ error: 'Failed to add new team.' });
+  }
+});
+
 // Voting Endpoints
 app.get('/api/votes/my-votes', requireAuth, async (req, res) => {
   try {

@@ -110,17 +110,28 @@
       <div class="backdrop-blur-xl bg-slate-900/35 border border-slate-800/50 rounded-3xl p-6 md:p-8 space-y-6 shadow-md">
         <div>
           <h3 class="text-lg font-bold text-white">Customize Team Names</h3>
-          <p class="text-xs text-slate-400 mt-1">Configure the official display names of the 8 participating groups.</p>
+          <p class="text-xs text-slate-400 mt-1">Configure the official display names of the participating groups.</p>
         </div>
         
         <form id="teamsForm" class="space-y-4">
-          <div id="teamsInputsContainer" class="space-y-3.5 max-h-[380px] overflow-y-auto pr-2">
+          <div id="teamsInputsContainer" class="space-y-3.5 max-h-[280px] overflow-y-auto pr-2">
             <!-- Dynamically generated inputs -->
           </div>
           <button type="submit" id="saveTeamsBtn" class="w-full py-3 bg-slate-950 hover:bg-slate-800 text-sm font-semibold border border-slate-800 hover:border-slate-700 rounded-xl transition-all duration-300">
             Save Changes
           </button>
         </form>
+
+        <div class="border-t border-slate-800/40 pt-6">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-rose-500 mb-3">Add New Team</h4>
+          <form id="addTeamForm" class="flex gap-3">
+            <input type="text" id="newTeamNameInput" required placeholder="Enter new team name..."
+              class="flex-grow bg-slate-950 border border-slate-850/80 focus:border-rose-500 rounded-xl py-2.5 px-4 text-xs text-white placeholder-slate-700 outline-none transition-colors">
+            <button type="submit" id="addTeamBtn" class="px-5 py-2.5 bg-gradient-to-r from-rose-500 to-indigo-600 hover:from-rose-600 hover:to-indigo-700 text-xs font-semibold rounded-xl shadow-lg shadow-rose-500/10 transition-all duration-300 whitespace-nowrap">
+              Add Team
+            </button>
+          </form>
+        </div>
       </div>
 
       <!-- Right Panel: Submission Progress Checker -->
@@ -333,6 +344,41 @@
       } finally {
         saveBtn.disabled = false;
         saveBtn.textContent = 'Save Changes';
+      }
+    });
+
+    // Add New Team form handler
+    document.getElementById('addTeamForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const input = document.getElementById('newTeamNameInput');
+      const name = input.value.trim();
+      if (!name) return;
+
+      const addBtn = document.getElementById('addTeamBtn');
+      addBtn.disabled = true;
+      addBtn.textContent = 'Adding...';
+
+      try {
+        const response = await fetch('/api/admin/teams/add', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name })
+        });
+
+        if (response.ok) {
+          showToast('New team added successfully!');
+          input.value = '';
+          await loadTeams();
+        } else {
+          const errData = await response.json();
+          showToast(errData.error || 'Failed to add new team.', true);
+        }
+      } catch (err) {
+        console.error('Add team error:', err);
+        showToast('Network error while adding new team.', true);
+      } finally {
+        addBtn.disabled = false;
+        addBtn.textContent = 'Add Team';
       }
     });
 

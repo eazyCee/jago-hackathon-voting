@@ -158,8 +158,8 @@
       const container = document.getElementById('boardContainer');
       container.replaceChildren();
 
-      // Set container height dynamically based on 8 cards
-      container.style.height = `${(cardHeight + cardGap) * 8}px`;
+      // Set container height dynamically based on active team count
+      container.style.height = `${(cardHeight + cardGap) * resultsData.length}px`;
 
       // Sort alphabetically/index first for neutral phase
       const sortedNeutral = [...resultsData].sort((a, b) => a.id.localeCompare(b.id));
