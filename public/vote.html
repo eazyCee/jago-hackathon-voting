@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vote - Jago Hackathon Voting</title>
+  <!-- Tailwind Play CDN (v3.4) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    h1, h2, h3 {
+      font-family: 'Outfit', sans-serif;
+    }
+    .mesh-bg {
+      background-color: #0b0f19;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.12) 0, transparent 40%), 
+        radial-gradient(at 100% 0%, rgba(244, 63, 94, 0.08) 0, transparent 40%),
+        radial-gradient(at 50% 100%, rgba(120, 119, 198, 0.12) 0, transparent 50%);
+    }
+    /* Custom radio styling for 1-5 scale buttons */
+    .rate-btn:checked + label {
+      background-color: rgb(244 63 94); /* Tailwind rose-500 */
+      border-color: rgb(244 63 94);
+      color: white;
+      box-shadow: 0 0 12px rgba(244, 63, 94, 0.4);
+    }
+  </style>
+</head>
+<body class="mesh-bg text-slate-100 min-h-screen flex flex-col justify-between">
+
+  <!-- Header Section -->
+  <header class="w-full px-6 py-4 flex justify-between items-center border-b border-slate-800/40 backdrop-blur-md sticky top-0 z-50 bg-slate-950/80">
+    <div class="flex items-center space-x-3">
+      <div class="h-9 w-9 rounded-xl bg-gradient-to-tr from-rose-500 to-amber-500 flex items-center justify-center font-extrabold text-white text-lg shadow-lg shadow-rose-500/20">J</div>
+      <span class="text-lg font-bold tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">Jago Hackathon</span>
+    </div>
+    <div class="flex items-center space-x-4">
+      <div class="text-xs font-semibold text-slate-400 bg-slate-900/60 border border-slate-800/80 px-3 py-1.5 rounded-full flex items-center space-x-2">
+        <span class="inline-block h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span id="userEmailDisplay">voter@tech.jago.com</span>
+      </div>
+      <button id="logoutBtn" class="text-xs text-slate-400 hover:text-white bg-slate-900/40 hover:bg-slate-800/60 border border-slate-800/80 px-3 py-1.5 rounded-full transition-all duration-300">
+        Sign Out
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Grid Section -->
+  <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-8 space-y-6">
+    <!-- Guideline Panel -->
+    <div class="relative overflow-hidden backdrop-blur-xl bg-slate-900/65 border border-slate-800/60 rounded-3xl p-6 md:p-8 shadow-xl shadow-slate-950/40">
+      <div class="absolute -right-12 -top-12 h-44 w-44 rounded-full bg-rose-500/10 blur-2xl pointer-events-none"></div>
+      <h2 class="text-xl md:text-2xl font-bold bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent flex items-center gap-2">
+        <svg class="w-6 h-6 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+        </svg>
+        Evaluation Guidelines
+      </h2>
+      <p class="text-sm text-slate-400 mt-2">Rate each team from 1 (Low) to 5 (Outstanding) based on the three official criteria below. Feel free to save your progress at any time.</p>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6 pt-6 border-t border-slate-800/40">
+        <!-- Criteria 1 -->
+        <div class="flex gap-4">
+          <div class="h-10 w-10 flex-shrink-0 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center font-bold text-rose-400 Outfit text-lg">1</div>
+          <div>
+            <h3 class="text-sm font-semibold text-white">Impact & Usefulness</h3>
+            <p class="text-xs text-slate-400 mt-1 leading-relaxed">Does the solution solve a genuine pain-point for Jago or our users? What is the business potential or operational value?</p>
+          </div>
+        </div>
+        <!-- Criteria 2 -->
+        <div class="flex gap-4">
+          <div class="h-10 w-10 flex-shrink-0 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center font-bold text-indigo-400 Outfit text-lg">2</div>
+          <div>
+            <h3 class="text-sm font-semibold text-white">Innovation & Creativity</h3>
+            <p class="text-xs text-slate-400 mt-1 leading-relaxed">Is the idea unique, disruptive, and well-thought-out? Does it showcase forward-thinking and original architecture?</p>
+          </div>
+        </div>
+        <!-- Criteria 3 -->
+        <div class="flex gap-4">
+          <div class="h-10 w-10 flex-shrink-0 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center font-bold text-amber-400 Outfit text-lg">3</div>
+          <div>
+            <h3 class="text-sm font-semibold text-white">Functionality & Working Demo</h3>
+            <p class="text-xs text-slate-400 mt-1 leading-relaxed">How mature is the codebase or prototype? Is there a real, functional demonstration or a fully integrated user simulation?</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Teams Loading Skeleton -->
+    <div id="loadingState" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="h-64 rounded-3xl bg-slate-900/30 border border-slate-800/40 animate-pulse"></div>
+      <div class="h-64 rounded-3xl bg-slate-900/30 border border-slate-800/40 animate-pulse"></div>
+    </div>
+
+    <!-- Voting Grid -->
+    <form id="votingForm" class="hidden space-y-8">
+      <div id="teamsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Dynmically filled with JS -->
+      </div>
+
+      <!-- Submit Section -->
+      <div class="sticky bottom-4 z-40 backdrop-blur-xl bg-slate-950/85 border border-slate-800/80 p-5 rounded-3xl shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center space-x-2 text-xs text-slate-400">
+          <span id="saveStatusDot" class="inline-block h-2 w-2 rounded-full bg-indigo-400 animate-ping"></span>
+          <span id="saveStatus">All progress saved locally.</span>
+        </div>
+        <div class="flex w-full sm:w-auto items-center gap-4">
+          <button type="submit" id="saveBtn" class="flex-grow sm:flex-grow-0 px-8 py-3.5 bg-gradient-to-r from-rose-500 to-indigo-600 hover:from-rose-600 hover:to-indigo-700 text-sm font-semibold rounded-xl shadow-lg shadow-rose-500/10 transition-all duration-300 transform active:scale-98">
+            Submit & Record Votes
+          </button>
+        </div>
+      </div>
+    </form>
+  </main>
+
+  <!-- Success Modal -->
+  <div id="successModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+    <div class="backdrop-blur-xl bg-slate-900/90 border border-slate-800/80 rounded-3xl p-8 max-w-md w-full text-center shadow-2xl shadow-indigo-500/10">
+      <div class="mx-auto h-16 w-16 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl flex items-center justify-center text-emerald-400 mb-4">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+        </svg>
+      </div>
+      <h3 class="text-xl font-extrabold text-white">Votes Submitted!</h3>
+      <p class="text-sm text-slate-400 mt-2 leading-relaxed">Thank you! Your evaluation has been safely written to Firestore. You can return and update your scores anytime before voting closes.</p>
+      <div class="mt-6 flex flex-col gap-3">
+        <button id="closeModalBtn" class="px-6 py-2.5 bg-slate-950 hover:bg-slate-800 text-sm font-semibold border border-slate-800/80 rounded-xl transition-all duration-300">
+          Dismiss
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error Toast -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 hidden flex items-center p-4 text-xs border border-rose-500/20 bg-rose-500/10 text-rose-400 rounded-xl max-w-md">
+    <span id="toastMessage"></span>
+  </div>
+
+  <!-- Footer -->
+  <footer class="w-full text-center py-6 border-t border-slate-800/20 backdrop-blur-sm mt-8">
+    <p class="text-xs text-slate-500 tracking-wide">&copy; 2026 Bank Jago Technology. Built for Innovation & Excellence.</p>
+  </footer>
+
+  <!-- App logic -->
+  <script>
+    let voterEmail = '';
+    let teams = [];
+    let savedVotes = {};
+
+    // Auth validation
+    async function checkAuth() {
+      try {
+        const res = await fetch('/api/me');
+        const data = await res.json();
+        if (!data.loggedIn) {
+          window.location.href = '/index.html';
+          return;
+        }
+        voterEmail = data.email;
+        document.getElementById('userEmailDisplay').textContent = voterEmail;
+        
+        // Fetch teams and prior votes
+        await loadTeams();
+        await loadMyVotes();
+        renderTeams();
+      } catch (err) {
+        console.error('Auth verify failure:', err);
+        window.location.href = '/index.html';
+      }
+    }
+
+    // Load comp structures
+    async function loadTeams() {
+      const res = await fetch('/api/teams');
+      if (res.ok) {
+        teams = await res.json();
+      } else {
+        showToast('Failed to load Teams from Firestore.');
+      }
+    }
+
+    async function loadMyVotes() {
+      const res = await fetch('/api/votes/my-votes');
+      if (res.ok) {
+        savedVotes = await res.json();
+      }
+    }
+
+    // Dynamic Render
+    function renderTeams() {
+      const container = document.getElementById('teamsContainer');
+      container.replaceChildren(); // clear skeleton
+
+      teams.forEach((team) => {
+        const votesObj = savedVotes[team.id] || { criteria_1: 3, criteria_2: 3, criteria_3: 3 };
+
+        const card = document.createElement('div');
+        card.className = 'backdrop-blur-xl bg-slate-900/35 border border-slate-800/50 rounded-3xl p-6 md:p-8 space-y-6 shadow-md transition-all hover:border-slate-700/60 hover:bg-slate-900/50';
+
+        const cardHeader = `
+          <div class="flex justify-between items-start">
+            <div>
+              <div class="text-[10px] font-bold uppercase tracking-wider text-rose-500 mb-1">Team ${team.index + 1}</div>
+              <h3 class="text-lg font-bold text-white">${escapeHtml(team.name)}</h3>
+            </div>
+            <div class="text-[10px] font-bold px-2 py-1 bg-slate-950 border border-slate-800 text-slate-400 rounded-lg">ID: ${team.id}</div>
+          </div>
+          <div class="space-y-5 pt-2">
+            ${renderCriteriaRow(team.id, 'criteria_1', 'Impact & Usefulness', votesObj.criteria_1)}
+            ${renderCriteriaRow(team.id, 'criteria_2', 'Innovation & Creativity', votesObj.criteria_2)}
+            ${renderCriteriaRow(team.id, 'criteria_3', 'Functionality & Demo', votesObj.criteria_3)}
+          </div>
+        `;
+        card.innerHTML = cardHeader;
+        container.appendChild(card);
+      });
+
+      document.getElementById('loadingState').classList.add('hidden');
+      document.getElementById('votingForm').classList.remove('hidden');
+    }
+
+    function renderCriteriaRow(teamId, key, label, selectedVal) {
+      let optionsStr = '';
+      for (let score = 1; score <= 5; score++) {
+        const inputId = `${teamId}_${key}_${score}`;
+        const checkedAttr = score === selectedVal ? 'checked' : '';
+        optionsStr += `
+          <div class="flex-1">
+            <input type="radio" id="${inputId}" name="${teamId}_${key}" value="${score}" ${checkedAttr} 
+              class="rate-btn hidden" onchange="registerVoteChange('${teamId}', '${key}', ${score})">
+            <label for="${inputId}" class="flex items-center justify-center h-10 border border-slate-800 bg-slate-950 rounded-xl text-slate-400 text-sm font-bold cursor-pointer hover:border-slate-700 hover:text-white transition-all select-none">
+              ${score}
+            </label>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="space-y-2">
+          <div class="flex justify-between items-center text-xs">
+            <span class="font-medium text-slate-300">${label}</span>
+            <span class="text-slate-500" id="${teamId}_${key}_valDisplay">Rating: ${selectedVal}/5</span>
+          </div>
+          <div class="flex gap-2">
+            ${optionsStr}
+          </div>
+        </div>
+      `;
+    }
+
+    // Register active choice
+    function registerVoteChange(teamId, criteriaKey, scoreVal) {
+      if (!savedVotes[teamId]) {
+        savedVotes[teamId] = { criteria_1: 3, criteria_2: 3, criteria_3: 3 };
+      }
+      savedVotes[teamId][criteriaKey] = scoreVal;
+      document.getElementById(`${teamId}_${criteriaKey}_valDisplay`).textContent = `Rating: ${scoreVal}/5`;
+      
+      const saveStatus = document.getElementById('saveStatus');
+      const saveStatusDot = document.getElementById('saveStatusDot');
+      saveStatus.textContent = 'Unsaved changes in active draft.';
+      saveStatusDot.className = 'inline-block h-2 w-2 rounded-full bg-amber-400 animate-pulse';
+    }
+
+    // Form submit
+    document.getElementById('votingForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const saveBtn = document.getElementById('saveBtn');
+      const saveStatus = document.getElementById('saveStatus');
+
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'Recording to Firestore...';
+
+      try {
+        const response = await fetch('/api/votes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ votes: savedVotes })
+        });
+
+        if (response.ok) {
+          const saveStatusDot = document.getElementById('saveStatusDot');
+          saveStatus.textContent = 'All votes recorded in database.';
+          saveStatusDot.className = 'inline-block h-2 w-2 rounded-full bg-emerald-500 animate-pulse';
+          document.getElementById('successModal').classList.remove('hidden');
+        } else {
+          const data = await response.json();
+          showToast(data.error || 'Failed to submit votes.');
+        }
+      } catch (err) {
+        console.error('Submit error:', err);
+        showToast('Network error: Could not commit voting record.');
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Submit & Record Votes';
+      }
+    });
+
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      await fetch('/api/logout', { method: 'POST' });
+      window.location.href = '/index.html';
+    });
+
+    document.getElementById('closeModalBtn').addEventListener('click', () => {
+      document.getElementById('successModal').classList.add('hidden');
+    });
+
+    // Helper functions
+    function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMessage').textContent = msg;
+      toast.classList.remove('hidden');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 4000);
+    }
+
+    // Initialize Page
+    checkAuth();
+  </script>
+</body>
+</html>

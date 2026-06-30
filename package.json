@@ -1,0 +1,20 @@
+{
+  "name": "jago-hackathon-voting",
+  "version": "1.0.0",
+  "description": "Jago Hackathon Voting Web Application",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "@google-cloud/firestore": "^7.8.0",
+    "cookie-session": "^2.1.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "private": true
+}

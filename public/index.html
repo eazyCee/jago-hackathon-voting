@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Jago Hackathon Voting</title>
+  <!-- Tailwind Play CDN (v3.4) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    h1, h2, h3 {
+      font-family: 'Outfit', sans-serif;
+    }
+    .mesh-bg {
+      background-color: #0f172a;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0, transparent 50%), 
+        radial-gradient(at 100% 0%, rgba(244, 63, 94, 0.1) 0, transparent 50%),
+        radial-gradient(at 50% 100%, rgba(120, 119, 198, 0.15) 0, transparent 50%);
+    }
+  </style>
+</head>
+<body class="mesh-bg text-slate-100 min-h-screen flex flex-col justify-between overflow-hidden">
+
+  <!-- Header Section -->
+  <header class="w-full px-6 py-4 flex justify-between items-center border-b border-slate-800/40 backdrop-blur-sm">
+    <div class="flex items-center space-x-3">
+      <div class="h-9 w-9 rounded-xl bg-gradient-to-tr from-rose-500 to-amber-500 flex items-center justify-center font-extrabold text-white text-lg shadow-lg shadow-rose-500/20">J</div>
+      <span class="text-lg font-bold tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">Jago Hackathon</span>
+    </div>
+    <div class="text-xs font-semibold uppercase tracking-wider text-slate-500 bg-slate-900/60 border border-slate-800/80 px-3 py-1.5 rounded-full">
+      June 2026 Edition
+    </div>
+  </header>
+
+  <!-- Main Login Card -->
+  <main class="flex-grow flex items-center justify-center p-4">
+    <div class="relative w-full max-w-md">
+      <!-- Glow effect behind card -->
+      <div class="absolute -inset-1 rounded-3xl bg-gradient-to-r from-rose-500 to-indigo-600 opacity-20 blur-xl transition duration-1000 group-hover:opacity-40"></div>
+      
+      <div class="relative backdrop-blur-xl bg-slate-900/75 border border-slate-800/80 rounded-3xl p-8 shadow-2xl shadow-slate-950/50">
+        <!-- Brand/Icon -->
+        <div class="text-center mb-8">
+          <div class="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-950 border border-slate-800 shadow-inner mb-4">
+            <svg class="h-8 w-8 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <h2 class="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">
+            Voter Login
+          </h2>
+          <p class="text-sm text-slate-400 mt-2">Enter your Jago or DKatalis tech email to cast your vote.</p>
+        </div>
+
+        <!-- Form -->
+        <form id="loginForm" class="space-y-5">
+          <div>
+            <label for="email" class="block text-xs font-medium uppercase tracking-wider text-slate-400 mb-2">Corporate Email</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-500">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 11-18 0"></path>
+                </svg>
+              </span>
+              <input type="email" id="email" required placeholder="name@tech.jago.com" 
+                class="w-full bg-slate-950 border border-slate-800 focus:border-rose-500 focus:ring-1 focus:ring-rose-500 rounded-xl py-3 pl-11 pr-4 text-sm text-white placeholder-slate-600 transition-all outline-none">
+            </div>
+          </div>
+
+          <!-- Error Alert -->
+          <div id="errorAlert" class="hidden flex items-center p-3 text-xs border border-rose-500/20 bg-rose-500/5 text-rose-400 rounded-xl animate-pulse">
+            <svg class="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+            </svg>
+            <span id="errorMessage">Error text here.</span>
+          </div>
+
+          <button type="submit" id="submitBtn" 
+            class="relative w-full group overflow-hidden rounded-xl bg-gradient-to-r from-rose-500 to-indigo-600 p-[1px] focus:outline-none transition-all duration-300 transform active:scale-[0.98]">
+            <span class="absolute inset-0 bg-gradient-to-r from-rose-600 to-indigo-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+            <div class="relative bg-slate-950 group-hover:bg-transparent rounded-[11px] py-3 text-center transition-colors duration-300">
+              <span class="text-sm font-semibold text-white tracking-wide">Enter Voting Dashboard</span>
+            </div>
+          </button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="w-full text-center py-6 border-t border-slate-800/30 backdrop-blur-sm">
+    <p class="text-xs text-slate-500 tracking-wide">&copy; 2026 Bank Jago Technology. Built for Innovation & Excellence.</p>
+  </footer>
+
+  <!-- App logic -->
+  <script>
+    // Check if already logged in and redirect
+    async function checkAuth() {
+      try {
+        const res = await fetch('/api/me');
+        const data = await res.json();
+        if (data.loggedIn) {
+          if (data.role === 'admin') {
+            window.location.href = '/admin.html';
+          } else {
+            window.location.href = '/vote.html';
+          }
+        }
+      } catch (err) {
+        console.error('Failed to check authentication status:', err);
+      }
+    }
+
+    checkAuth();
+
+    const form = document.getElementById('loginForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const errorAlert = document.getElementById('errorAlert');
+    const errorMessage = document.getElementById('errorMessage');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const email = document.getElementById('email').value.trim();
+      if (!email) return;
+
+      errorAlert.classList.add('hidden');
+      submitBtn.disabled = true;
+      submitBtn.classList.add('opacity-75');
+
+      try {
+        const response = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          if (data.role === 'admin') {
+            window.location.href = '/admin.html';
+          } else {
+            window.location.href = '/vote.html';
+          }
+        } else {
+          errorMessage.textContent = data.error || 'Login failed. Please check your email.';
+          errorAlert.classList.remove('hidden');
+        }
+      } catch (err) {
+        console.error('Login error:', err);
+        errorMessage.textContent = 'Network error: Failed to connect to server.';
+        errorAlert.classList.remove('hidden');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('opacity-75');
+      }
+    });
+  </script>
+</body>
+</html>
