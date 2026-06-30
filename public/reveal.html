@@ -213,7 +213,7 @@
             <div class="flex flex-col items-end justify-center w-24">
               <span class="text-[9px] font-bold uppercase tracking-wider text-slate-500" id="scoreLabel_${team.id}">Revealing</span>
               <div class="text-lg font-black font-mono tracking-tight text-slate-500 transition-colors duration-500 mt-0.5" id="scoreText_${team.id}">
-                0.0
+                0,00
               </div>
             </div>
           </div>
@@ -264,7 +264,7 @@
           card.classList.add('border-slate-800/60');
           rankBadge.textContent = '-';
           rankBadge.className = 'h-10 w-10 flex-shrink-0 rounded-xl bg-slate-950 border border-slate-850 flex items-center justify-center font-extrabold text-slate-500 Outfit text-base transition-colors duration-500';
-          scoreText.textContent = '0.0';
+          scoreText.textContent = '0,00';
           scoreText.className = 'text-lg font-black font-mono tracking-tight text-slate-500 mt-0.5';
           scoreLabel.textContent = 'Revealing';
           scoreSub.textContent = 'Neutral Standings';
@@ -276,7 +276,7 @@
             document.getElementById(`barBox_${c}_${team.id}`).className = 'hidden md:flex flex-col items-start w-28 text-left transition-all duration-500 opacity-20';
           });
 
-        } else {
+         } else {
           // Highlight ranks
           rankBadge.textContent = `#${rankIndex + 1}`;
           
@@ -292,12 +292,12 @@
 
           // Cumulative value setting
           const revealedScore = team[config.cumulativeField];
-          scoreText.textContent = revealedScore.toFixed(1);
+          scoreText.textContent = revealedScore.toFixed(2).replace('.', ',');
           scoreText.className = 'text-xl font-black font-mono tracking-tight text-white mt-0.5';
-          scoreLabel.textContent = `Total / ${currentPhase * 5}.0`;
-          scoreSub.innerHTML = `<span class="text-rose-400">c1: ${team.c1.toFixed(1)}</span>` + 
-                               (currentPhase >= 2 ? ` &middot; <span class="text-indigo-400">c2: ${team.c2.toFixed(1)}</span>` : '') + 
-                               (currentPhase >= 3 ? ` &middot; <span class="text-amber-400">c3: ${team.c3.toFixed(1)}</span>` : '');
+          scoreLabel.textContent = `Total / ${currentPhase * 5},00`;
+          scoreSub.innerHTML = `<span class="text-rose-400">c1: ${team.c1.toFixed(2).replace('.', ',')}</span>` + 
+                               (currentPhase >= 2 ? ` &middot; <span class="text-indigo-400">c2: ${team.c2.toFixed(2).replace('.', ',')}</span>` : '') + 
+                               (currentPhase >= 3 ? ` &middot; <span class="text-amber-400">c3: ${team.c3.toFixed(2).replace('.', ',')}</span>` : '');
 
           // Highlight Border and background glow transitions
           card.classList.remove('border-slate-800/60');
