@@ -98,13 +98,19 @@ let db;
 let isMockDb = false;
 
 function initializeDatabase() {
+  if (process.env.FORCE_MOCK_DB === 'true' || !process.env.GOOGLE_CLOUD_PROJECT) {
+    console.warn('In-memory Mock Database force-enabled or no GOOGLE_CLOUD_PROJECT detected. Instantiating Mock Database immediately.');
+    db = new MockFirestore();
+    isMockDb = true;
+    return;
+  }
+
   try {
-    const firestoreOptions = {};
-    if (process.env.GOOGLE_CLOUD_PROJECT) {
-      firestoreOptions.projectId = process.env.GOOGLE_CLOUD_PROJECT;
-    }
+    const firestoreOptions = {
+      projectId: process.env.GOOGLE_CLOUD_PROJECT
+    };
     db = new Firestore(firestoreOptions);
-    console.log('Attempting to connect to Google Cloud Firestore...');
+    console.log(`Attempting to connect to Google Cloud Firestore (Project: ${process.env.GOOGLE_CLOUD_PROJECT})...`);
   } catch (err) {
     console.warn('WARNING: Failed to instantiate Firestore client. Falling back to in-memory Mock Database.');
     db = new MockFirestore();
@@ -189,10 +195,7 @@ const ALLOWED_EMAILS = new Set([
   "aux-nakita.dinanti@tech.jago.com"
 ]);
 
-const ADMIN_EMAILS = new Set([
-  "admin@clifftangel.altostrat.com",
-  "clifftangel@gmail.com"
-]);
+const ADMIN_EMAIL = "admin@clifftangel.altostrat.com";
 
 // Seeding function for default 8 teams
 async function seedDefaultTeams() {
@@ -253,10 +256,9 @@ app.post('/api/login', (req, res) => {
   }
   const cleanEmail = email.trim().toLowerCase();
   
-  const isAdmin = ADMIN_EMAILS.has(cleanEmail);
-  if (isAdmin || ALLOWED_EMAILS.has(cleanEmail)) {
+  if (cleanEmail === ADMIN_EMAIL || ALLOWED_EMAILS.has(cleanEmail)) {
     req.session.email = cleanEmail;
-    req.session.role = isAdmin ? 'admin' : 'voter';
+    req.session.role = cleanEmail === ADMIN_EMAIL ? 'admin' : 'voter';
     return res.json({
       success: true,
       email: cleanEmail,
@@ -406,9 +408,57 @@ app.post('/api/admin/reset', requireAuth, requireAdmin, async (req, res) => {
   }
 });
 
+// Admin Manual Config Endpoints
+app.get('/api/admin/manual-config', requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const configDoc = await db.collection('admin_config').doc('manual_scores').get();
+    if (configDoc.exists) {
+      res.json(configDoc.data());
+    } else {
+      res.json({ enabled: false, scores: {} });
+    }
+  } catch (err) {
+    console.error('Error fetching manual config:', err);
+    res.status(500).json({ error: 'Failed to retrieve manual override configuration.' });
+  }
+});
+
+app.post('/api/admin/manual-config', requireAuth, requireAdmin, async (req, res) => {
+  const { enabled, scores } = req.body;
+  if (typeof enabled !== 'boolean' || !scores || typeof scores !== 'object') {
+    return res.status(400).json({ error: 'Invalid manual config payload.' });
+  }
+
+  // Validate the scores are 1.0 to 5.0 numbers
+  for (const teamId in scores) {
+    const s = scores[teamId];
+    if (typeof s.c1 !== 'number' || s.c1 < 1.0 || s.c1 > 5.0 ||
+        typeof s.c2 !== 'number' || s.c2 < 1.0 || s.c2 > 5.0 ||
+        typeof s.c3 !== 'number' || s.c3 < 1.0 || s.c3 > 5.0) {
+      return res.status(400).json({ error: `Scores for ${teamId} must be numeric ratings between 1.0 and 5.0.` });
+    }
+  }
+
+  try {
+    await db.collection('admin_config').doc('manual_scores').set({
+      enabled,
+      scores,
+      updated_at: new Date().toISOString()
+    });
+    res.json({ success: true, message: 'Manual override configuration saved successfully.' });
+  } catch (err) {
+    console.error('Error saving manual config:', err);
+    res.status(500).json({ error: 'Failed to save manual override configuration.' });
+  }
+});
+
 // Results Endpoint
 app.get('/api/results', requireAuth, async (req, res) => {
   try {
+    // Check manual override configuration first
+    const configDoc = await db.collection('admin_config').doc('manual_scores').get();
+    const config = configDoc.exists ? configDoc.data() : { enabled: false, scores: {} };
+
     // 1. Fetch all teams
     const teamsSnapshot = await db.collection('teams').get();
     const teamsMap = {};
@@ -424,7 +474,30 @@ app.get('/api/results', requireAuth, async (req, res) => {
       };
     });
 
-    // 2. Fetch all votes
+    if (config.enabled) {
+      // Return manual override scores, using team display names from DB
+      const results = Object.values(teamsMap).map(team => {
+        const manual = config.scores[team.id] || { c1: 3.0, c2: 3.0, c3: 3.0 };
+        const c1 = Number(Number(manual.c1 || 0).toFixed(2));
+        const c2 = Number(Number(manual.c2 || 0).toFixed(2));
+        const c3 = Number(Number(manual.c3 || 0).toFixed(2));
+
+        return {
+          id: team.id,
+          name: team.name,
+          voterCount: 0, // Indicates manual override in UI if needed
+          c1,
+          c2,
+          c3,
+          p1_cumulative: c1,
+          p2_cumulative: Number((c1 + c2).toFixed(2)),
+          p3_cumulative: Number((c1 + c2 + c3).toFixed(2))
+        };
+      });
+      return res.json(results);
+    }
+
+    // 2. Fetch all votes (Standard computation)
     const votesSnapshot = await db.collection('votes').get();
     votesSnapshot.forEach(doc => {
       const data = doc.data();
@@ -462,6 +535,7 @@ app.get('/api/results', requireAuth, async (req, res) => {
     });
 
     res.json(results);
+
   } catch (err) {
     console.error('Error calculating results aggregation:', err);
     res.status(500).json({ error: 'Failed to aggregate results data.' });
