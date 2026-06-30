@@ -189,7 +189,10 @@ const ALLOWED_EMAILS = new Set([
   "aux-nakita.dinanti@tech.jago.com"
 ]);
 
-const ADMIN_EMAIL = "admin@clifftangel.altostrat.com";
+const ADMIN_EMAILS = new Set([
+  "admin@clifftangel.altostrat.com",
+  "clifftangel@gmail.com"
+]);
 
 // Seeding function for default 8 teams
 async function seedDefaultTeams() {
@@ -250,9 +253,10 @@ app.post('/api/login', (req, res) => {
   }
   const cleanEmail = email.trim().toLowerCase();
   
-  if (cleanEmail === ADMIN_EMAIL || ALLOWED_EMAILS.has(cleanEmail)) {
+  const isAdmin = ADMIN_EMAILS.has(cleanEmail);
+  if (isAdmin || ALLOWED_EMAILS.has(cleanEmail)) {
     req.session.email = cleanEmail;
-    req.session.role = cleanEmail === ADMIN_EMAIL ? 'admin' : 'voter';
+    req.session.role = isAdmin ? 'admin' : 'voter';
     return res.json({
       success: true,
       email: cleanEmail,
